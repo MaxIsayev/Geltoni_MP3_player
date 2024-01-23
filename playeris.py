@@ -237,9 +237,9 @@ def CloseWindow():
 
 
 master = Tk()
-master.title("Mp3 Player")
+master.title("Geltonuju Grotuvas")
 master.protocol("WM_DELETE_WINDOW", CloseWindow)
-master.geometry("500x600")
+master.geometry("500x500")
 master.resizable(False, False)
 update = Thread(target=UpdateSlider)
 pos = IntVar()
