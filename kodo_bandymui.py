@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import PySimpleGUI as sg
 
 #
@@ -52,5 +51,3 @@ def MediaPlayerGUI():
         # If a button was pressed, display it on the GUI by updating the text element
         if event != sg.TIMEOUT_KEY:
             window['-OUTPUT-'].update(event)
-
-MediaPlayerGUI()
