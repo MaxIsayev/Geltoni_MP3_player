@@ -244,6 +244,11 @@ master.resizable(False, False)
 update = Thread(target=UpdateSlider)
 pos = IntVar()
 
+theme_img = PhotoImage(file="theme.png")
+# Show image using label 
+label1 = Label(master, image = theme_img) 
+label1.place(x = 0, y = 0) 
+
 back_img = PhotoImage(file="backpic.PNG")
 back_button = Button(master, image=back_img, command=Back)
 play_img = PhotoImage(file="playpic.PNG")
