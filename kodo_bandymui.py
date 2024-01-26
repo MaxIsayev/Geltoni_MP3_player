@@ -299,6 +299,7 @@ def UpdateTime():
 def UpdateSlider():
     global player, totallength, playing, slider_moved, quitthreading
     while True:
+<<<<<<< HEAD
         if playing:
             if slider_moved:
                 pos.set(slider.get() + 1)
@@ -411,3 +412,11 @@ volume_slider.place(x=400, y=250)
 
 music_list.bind("<<ListboxSelect>>", PlaySelected)
 mainloop()
+=======
+        event, values = window.read(timeout=100)        # Poll every 100 ms
+        if event == 'Exit' or event == sg.WIN_CLOSED:
+            break
+        # If a button was pressed, display it on the GUI by updating the text element
+        if event != sg.TIMEOUT_KEY:
+            window['-OUTPUT-'].update(event)
+>>>>>>> 636371d4b9f490a25199bfa0ba2f2c890e9b8dbf
