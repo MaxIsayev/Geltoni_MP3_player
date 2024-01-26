@@ -38,8 +38,12 @@ def AddToList(musicobj):
 def OpenFile():
     try:
         filename = filedialog.askopenfilenames(initialdir="/",
-                                               title="Select a File",
-                                               filetypes=(('MP3 Files', '*.mp3'), ('M3U Files', '*.m3u'), ('Flac Files', '*.flac')))
+                                               title="Select a File", filetypes=(('MP3 Files', '*.mp3'),
+                                                                                 ('M3U Files', '*.m3u'),
+                                                                                 ('Flac Files', '*.flac'),
+                                                                                 ('Wave Files', '*.wav'),
+                                                                                 ('Aiff Files', '*.aiff'),
+                                                                                 ('Ogg Files', '*.ogg')))
         if (filename == ""):
             return
         for files in filename:
@@ -55,88 +59,49 @@ def VolumeSliderChanged(value):
 
 def Soundd():
     global volume
-    soundslider = Scale(master, from_=0, to=100, orient=HORIZONTAL,
-                        command=VolumeSliderChanged, length=200)
-    soundslider.set(volume * 100)
+    soundslider = Scale(master, from_=0, to=100, orient=HORIZONTAL, command=VolumeSliderChanged, length=200)
+    sounds_slider.set(volume * 20)
     soundslider.place(x=85, y=250)
 
 def Mute():
     global volume
-    sounds_slider.set(volume * 0)
+    mixer.music.set_volume(0)
 
 def SoundChanger(self):
     global volume
     global novolume_button
-    global lowvolume_button
-    global highvolume_button
     self.soundslider = int(self) / 100
     player.set_volume(volume)
-    if int(self) == 0:
-        novolume_button.place(x=400, y=500)
-        lowvolume_button.place_forget()
-        highvolume_button.place_forget()
-    if int(self) > 0 and int(self) < 60:
-        novolume_button.place_forget()
-        highvolume_button.place_forget()
-        lowvolume_button.place(x=400, y=500)
-    if int(self) > 60:
-        novolume_button.place_forget()
-        highvolume_button.place(x=400, y=500)
-        lowvolume_button.place_forget()
-
-def Sound():
-    soundpanel = Toplevel()
-    soundpanel.geometry("220x150")
-    soundpanel.resizable(False, False)
-    bass_slider = Scale(soundpanel, from_=-10, to=10, orient=HORIZONTAL, command=BassChanger, length=200, label="Bass")
-    bass_slider.set(bass)
-    bass_slider.pack()
-
-    low_mid_slider = Scale(soundpanel, from_=-10, to=10, orient=HORIZONTAL, command=LowMidChanger, length=200, label="Low Mid")
-    low_mid_slider.set(low_mid)
-    low_mid_slider.pack()
-
-    mid_slider = Scale(soundpanel, from_=-10, to=10, orient=HORIZONTAL, command=MidChanger, length=200, label="Mid")
-    mid_slider.set(mid)
-    mid_slider.pack()
-
-    high_mid_slider = Scale(soundpanel, from_=-10, to=10, orient=HORIZONTAL, command=HighMidChanger, length=200, label="High Mid")
-    high_mid_slider.set(high_mid)
-    high_mid_slider.pack()
-
-    treble_slider = Scale(soundpanel, from_=-10, to=10, orient=HORIZONTAL, command=TrebleChanger, length=200, label="Treble")
-    treble_slider.set(treble)
-    treble_slider.pack()
 
 def BassChanger(value):
     global bass
     bass = int(value)
-    mixer.music.set_volume(volume)
-    player.set_volume(volume, treble/10, bass/10)
+    mixer.music.bass(volume)
+    player.set_volume(bass/10)
 
 def LowMidChanger(value):
     global lowmid
     lowmid = int(value)
     mixer.music.set_volume(volume)
-    player.set_volume(volume, treble/10, bass/10)
+    player.set_volume(lowmid/10)
 
 def MidChanger(value):
     global mid
     mid = int(value)
     mixer.music.set_volume(volume)
-    player.set_volume(volume, treble/10, bass/10)
+    player.set_volume(mid/10)
 
 def HighMidChanger(value):
     global highmid
     highmid = int(value)
     mixer.music.set_volume(volume)
-    player.set_volume(volume, treble/10, bass/10)
+    player.set_volume(highmid/10)
 
 def TrebleChanger(value):
     global treble
     treble = int(value)
     mixer.music.set_volume(volume)
-    player.set_volume(volume, treble/10, bass/10)
+    player.set_volume(treble/10)
 
 def Previous():
     try:
@@ -224,19 +189,16 @@ def Play():
     else:
         playing = True
         player.unpause()
-        play_button.place_forget()
 
 def Pause():
     global playing
     playing = False
     player.pause()
-    pause_button.place_forget()
 
 def Stop():
     global wasstarted
     global playing
     if wasstarted == True:
-        pause_button.place_forget()
         wasstarted = False
         player.stop()
         playing = False
@@ -259,7 +221,6 @@ def Forward():
         player.load(playlist[nextmusic].file)
         player.play()
         UpdateTime()
-
 
 def Next():
     try:
@@ -328,14 +289,18 @@ def CloseWindow():
 
 # Create the main Tkinter window
 master = Tk()
-master.title("Mp3 Player  --= YELLOW SUBMARINE =-- ")
+master.title("Mp3 Player  - - - = YELLOW SUBMARINE v.1.01 beta = - - - ")
 master.protocol("WM_DELETE_WINDOW", CloseWindow)
-master.geometry("500x600")
+master.geometry("500x500")
 master.resizable(False, False)
 
 # Create the update thread
 update = Thread(target=UpdateSlider)
 pos = IntVar()
+
+theme_img = PhotoImage(file="theme.png")
+label1 = Label(master, image = theme_img)
+label1.place(x = 0, y = 100)  
 
 previous_img = PhotoImage(file="previous_button.PNG")
 previous_button = Button(master, image=previous_img, command=Previous)
@@ -353,23 +318,14 @@ next_img = PhotoImage(file="next_button.PNG")
 next_button = Button(master, image=next_img, command=Next)
 add_img = PhotoImage(file="add_button.PNG")
 add_button = Button(master, image=add_img, command=OpenFile)
-sound_img = PhotoImage(file="eq_button.PNG")
-sound_button = Button(master, image=sound_img, command=Sound)
+sound_img = PhotoImage(file="mute_button.PNG")
+novolume_button = Button(master, image=sound_img, command=Mute)
 current_song_time = Label(master, text="00:00")
 end_song_time = Label(master, text="00:00")
 slider = Scale(master, from_=0, to=100, orient=HORIZONTAL, command=FastForward, showvalue=False, length=315, variable=pos)
-novolume_img = PhotoImage(file="novolumepic.PNG")
-novolume_button = Button(master, image=novolume_img, command=Mute)
-lowvolume_img = PhotoImage(file="lowvolumepic.PNG")
-lowvolume_button = Button(master, image=lowvolume_img, command=Mute)
-highvolume_img = PhotoImage(file="highvolumepic.PNG")
-highvolume_button = Button(master, image=highvolume_img, command=Mute)
-current_song_time = Label(master, text="00:00")
-end_song_time = Label(master, text="00:00")
-slider = Scale(master, from_=0, to=100, orient=HORIZONTAL, command=FastForward, showvalue=False, length=315, variable=pos)
-volume_slider = Scale(master, from_=100, to=0, orient=VERTICAL, command=VolumeSliderChanged, length=110)
+volume_slider = Scale(master, from_=100, to=0, orient=VERTICAL, command=VolumeSliderChanged, length=100)
 volume_text = Label(master, text="Volume")
-music_list = Listbox(master, font=("davish"), width=53, height=11, selectmode=SINGLE)
+music_list = Listbox(master, font=("arial", 10), width=68, height=10, selectmode=SINGLE)
 bass_slider = Scale(master, from_=10, to=-10, orient=VERTICAL, command=BassChanger, length=100)
 bass_text = Label(master, text="Bass")
 low_mid_slider = Scale(master, from_=10, to=-10, orient=VERTICAL, command=LowMidChanger, length=100)
@@ -383,31 +339,36 @@ treble_text = Label(master, text="Treble")
 
 music_list.place(x=10, y=10)
 add_button.place(x=10, y=250)
-previous_button.place(x=50, y=500)
-back_button.place(x=100, y=500)
-play_button.place(x=150, y=500)
-pause_button.place(x=200, y=500)
-stop_button.place(x=250, y=500)
-forward_button.place(x=300, y=500)
-next_button.place(x=350, y=500)
-sound_button.place(x=450, y=500)
+previous_button.place(x=50, y=450)
+back_button.place(x=100, y=450)
+play_button.place(x=150, y=450)
+pause_button.place(x=200, y=450)
+stop_button.place(x=250, y=450)
+forward_button.place(x=300, y=450)
+next_button.place(x=350, y=450)
+novolume_button.place(x=450, y=450)
 current_song_time.place(x=50, y=400)
 end_song_time.place(x=410, y=400)
 slider.place(x=85, y=400)
 
 # Eq section
-bass_text.place(x=80, y=230)
-bass_slider.place(x=80, y=250)
-low_mid_text.place(x=120, y=230)
+bass_text.place(x=77, y=230)
+bass_slider.place(x=60, y=250)
+
+low_mid_text.place(x=126, y=230)
 low_mid_slider.place(x=120, y=250)
-mid_text.place(x=185, y=230)
-mid_slider.place(x=182, y=250)
-high_mid_text.place(x=225, y=230)
-high_mid_slider.place(x=225, y=250)
-treble_text.place(x=295, y=230)
-treble_slider.place(x=295, y=250)
+
+mid_text.place(x=198, y=230)
+mid_slider.place(x=180, y=250)
+
+high_mid_text.place(x=243, y=230)
+high_mid_slider.place(x=240, y=250)
+
+treble_text.place(x=312, y=230)
+treble_slider.place(x=300, y=250)
+
 volume_text.place(x=400, y=230)
-volume_slider.place(x=400, y=250)
+volume_slider.place(x=392, y=250)
 
 music_list.bind("<<ListboxSelect>>", PlaySelected)
 mainloop()
